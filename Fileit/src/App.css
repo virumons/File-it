@@ -1,0 +1,12 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik+Mono+One&family=Staatliches&display=swap');
+
+.hero_section{
+    background-image: url('./home-assets/heroback.svg');
+    background-repeat: no-repeat;
+    background-position:center;
+    background-size: cover;
+}
+
+.head-txt{
+    font-family: "Staatliches", sans-serif;
+}
