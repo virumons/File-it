@@ -1,12 +1,15 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import register from './assets/register.svg';
 import logo from './assets/logo.svg';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+// import { response } from 'express';
+import cors from 'cors';
 
 // import Newuser from './Newuser.jsx';
 function Register(){
   const navigate = useNavigate();
+  const[message,setMessage] = useState('');
   const [Formdata, Setformdata] = useState({
     fullname:'',
     phoneno:'',
@@ -62,17 +65,39 @@ function Register(){
     const uuid = Formdata.userid;
 
     if(Object.keys(ValidateErrors).length === 0){
-      navigate('/Dashboard',{state:uuid});
+      
       // const arrdata = Object.values(Formdata);
       // <Newuser Formdata={Formdata.fullname} />
       // console.log(arrdata);
      let Senddata = {...Formdata}
-       axios.post("http://localhost:8080/All_Users", Senddata)
-       .then((res)=>console.log("success"))
+      
+       try{
+       axios.post("http://localhost:8080/", Senddata)
+       .then(res=>{
+        console.log("success")
+        if( res.data == "exist"){
+          setMessage('Account exist please login')
+        }else{
+        setMessage(res.data.message)
+        navigate('/Dashboard',{state:uuid});
+        }
+       })
+       }catch(err){
+        console.log(err)
+       }
       // console.log('Response from server:', response.data);
     }
-     
+    
   }
+  // const [backdata,setbackdata] = useState([{}])
+  // useEffect(()=>{
+  //   fetch("http://localhost:8080/api").then(
+  //     response=>response.json()
+  //   ).then(
+  //     data =>
+  //       setbackdata(data)
+  //   )
+  // },[])
     return(
         <>
         <div className="flex h-[100vh] bg-white">
@@ -92,7 +117,7 @@ function Register(){
             <div className="w-1/2 p-4 flex flex-col justify-center items-center  ">
              
               <p className="font-semibold  text-xl">Create account</p>
-            <form className='w-[90%]' onSubmit={HandleSubmit}>
+            <form className='w-[90%]' onSubmit={HandleSubmit} action='POST'>
               
               <div className='flex flex-col w-[90%]'>
               <input type="text" name='fullname' onChange={handlechange} placeholder="First Name" 
@@ -116,7 +141,7 @@ function Register(){
               className=" border border-gray-300 rounded-lg px-4 py-2 m-2 h-12"required/>
               {errors.cpwd && <span className='text-[#e04646] pl-4'>{errors.cpwd}</span>}
               </div>
-
+              {message && <p className='text-[#000]'>{message}</p>}
               <div className='bg-gray-800 w-[90%] flex flex-row justify-center rounded-md py-2 '>
               {/* <Link to="/Dashboard" className=" text-white px-2 py-0 rounded-lg">Create account</Link> */}
               <button type="submit" className='text-white '>Create account</button>
