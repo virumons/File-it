@@ -124,6 +124,9 @@ const AddRec = () =>{
 const Shares = () =>{
   const location = useLocation();
   const recdata = location.state;
+  console.log(recdata)
+  const userId = recdata?.match?.userid || recdata;
+
   return(
     <>
     <div className='p-[20px] flex flex-col justify-start items-start mt-3 table-d'>
@@ -144,9 +147,11 @@ const Shares = () =>{
         {/* <h1>13-Feb-2024</h1>
         <h1>Sent</h1>
         <h1>Private</h1> */}
-        <h1>hj{recdata}</h1>
-        <h1>{recdata}</h1>
-        <h1>{recdata}</h1>
+        
+        {/* <h1>hj{recdata.match.userid || recdata}</h1> */}
+        <h1>hj{userId}</h1>
+        {/* <h1>{recdata}</h1>
+        <h1>{recdata}</h1> */}
       </div>
     </div>
     </div>

@@ -2,21 +2,23 @@ import React, { useState } from 'react'
 import  { Form, Link, useNavigate } from "react-router-dom";
 import loginback from "./assets/loginback.svg";
 import logo from "./assets/logo.svg";
+import axios from 'axios';
 
 function App(){
 
   const Navigate = useNavigate();
   const [errors, setErrors] = useState({});
-  const [Formdata,setformdata] = useState({
+  const [Formdata,Setformdata] = useState({
     email:'',
-    password:''
+    password:'',
   })
-  const handlechange =(e) =>{
-    const {name,value}= e.target;
-    setformdata({
-      ...Formdata,[name]:value
-    })
-  }
+  const handlechange =(e)=>{  
+    const {name,value} = e.target;
+    Setformdata({
+      ...Formdata, [name] : value
+    });
+    console.log(Formdata)
+   }
    
   const handlesubmit =(e)=>{
     e.preventDefault();
@@ -24,19 +26,37 @@ function App(){
 
     const numbers = /\d+/;
     const specialCharacters = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]+/;
-    if(Formdata.password.length < 8){
-      errorValues.password = "Password is more then 8 character";
+    if(!Formdata.password.length > 8){
+      errorValues.password = "Password should be more then 8 character";
     }else if(!specialCharacters.test(Formdata.password)){
       errorValues.password = "Password must contain one special characters";
     }else if(!numbers.test(Formdata.password)){
       errorValues.password = "Password must contain one or more number";
     }
     setErrors(errorValues);
-  
+    
     if(Object.keys(errorValues).length === 0){
-      // let sendData = {...Formdata}
-      // Navigate("/Dashboard", {state:sendData});
-      // // console.log(Formdata)
+      try{
+      // let Senddata = Object.values(Formdata)
+      let Senddata = {...Formdata};
+      console.log(Senddata)
+      
+      
+        axios.post("http://localhost:8080/login",Senddata)
+        .then(res=>{
+          console.log(res.data)
+          console.log("succcess")
+          if(res.data == "no"){
+            alert("Invalid Email or Password")
+          }else{
+            // const navdata = Object.keys(res.data);
+            // console.log(navdata)
+            Navigate('/Dashboard',{state:res.data})
+          }
+        })
+      }catch(err){
+        console.log(err)
+      }
     }
 
   }
@@ -63,11 +83,12 @@ function App(){
     
       <p className="font-semibold text-xl">Login</p>
     {/* input fields */}
-      <form onSubmit={handlesubmit} className='w-[100%]'>
+      <form onSubmit={handlesubmit} className='w-[100%]' action='POST'>
       <div className='flex flex-col w-[90%]' >
         <input type="email" 
         id="Email" 
         onChange={handlechange}
+        name='email'
         placeholder="Email" 
         className=" border border-gray-300 rounded-lg px-4 py-2 m-2" required></input>
         {errors.email && <span>{errors.email}</span>}
@@ -75,6 +96,7 @@ function App(){
         <input type="password" 
         id="password" 
         onChange={handlechange}
+        name='password'
         placeholder="Fileit-Password" 
         className=" border border-gray 300 rounded-lg px-4 m-2 py-2" required></input>
         {errors.password && <span>{errors.password}</span>}

@@ -3,10 +3,8 @@ import register from './assets/register.svg';
 import logo from './assets/logo.svg';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
-// import { response } from 'express';
 import cors from 'cors';
 
-// import Newuser from './Newuser.jsx';
 function Register(){
   const navigate = useNavigate();
   const[message,setMessage] = useState('');
@@ -66,7 +64,7 @@ function Register(){
 
     if(Object.keys(ValidateErrors).length === 0){
       
-      // const arrdata = Object.values(Formdata);
+      // const arrdata = Object.values(Formdata); object => array 
       // <Newuser Formdata={Formdata.fullname} />
       // console.log(arrdata);
      let Senddata = {...Formdata}
@@ -76,7 +74,7 @@ function Register(){
        .then(res=>{
         console.log("success")
         if( res.data == "exist"){
-          setMessage('Account exist please login')
+          setMessage('Account exist with the email prokvided please login')
         }else{
         setMessage(res.data.message)
         navigate('/Dashboard',{state:uuid});
