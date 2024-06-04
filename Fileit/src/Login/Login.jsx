@@ -54,6 +54,7 @@ function App(){
             Navigate('/Dashboard',{state:res.data})
           }
         })
+        
       }catch(err){
         console.log(err)
       }
@@ -101,7 +102,7 @@ function App(){
         className=" border border-gray 300 rounded-lg px-4 m-2 py-2" required></input>
         {errors.password && <span>{errors.password}</span>}
 
-        <Link to="/Password" className='text-[#7e7e7e] text-[18px] my-2 text-end'>Forgot password ?</Link>
+        {/* <Link to="/Password" className='text-[#7e7e7e] text-[18px] my-2 text-end'>Forgot password ?</Link> */}
         
         {/*submit button  */}
         <div className='bg-gray-800 w-full flex flex-row justify-center rounded-md py-2 '>

@@ -4,6 +4,7 @@ import './App.css'
 import search from './assets/search.svg'
 import { Link } from 'react-router-dom'
 import brake from './assets/Brake.svg'
+import axios from 'axios'
 import { useLocation } from 'react-router-dom'
 
 const Draft = () =>{
@@ -26,6 +27,7 @@ const Draft = () =>{
   };
   return(
     <>
+    {/* Draft code */}
       <div className='w-[50%] px-6 py-4 my-3 bg-[#fff] rounded-2xl'>
         <div className='flex flex-row justify-between items-center border-b-2 border-b-[#e0e0e0]'>
           <h1>Draft-Today </h1>
@@ -63,6 +65,8 @@ const Draft = () =>{
     </>
   )
 }
+
+// add favouite ****************************
 const AddRec = () =>{
   const [isOpenAdd, setIsOpenAdd] = useState(false);
 
@@ -80,39 +84,65 @@ const AddRec = () =>{
     // Close the dialog after deletion
     closeDialog();
   };
-  const saveit =()=>{
-    let username = document.getElementById('usr').value;
-    let wallet = document.getElementById('wall').value;
-    document.getElementById('addsave').innerHTML=`${username} ${wallet}`; 
-  }
+  const [Formdata,Setformdata] =  useState({
+    user:'',
+    waddress:'',
+  })
+  const handlechange =(e)=>{  
+    const {name,value} = e.target;
+    Setformdata({
+      ...Formdata, [name] : value
+    });
+    console.log(Formdata)
+   }
+   const handlesubmit =(e)=>{
+    e.preventDefault();
+      try{
+      // let Senddata = Object.values(Formdata)
+      let Senddata = {...Formdata};
+      console.log(Senddata);
+        axios.post("http://localhost:8080/getall",Senddata).then(res=>{
+          console.log("suss");
+        })
+        // closeDialog();
+      }catch(err){
+        console.log(err)
+      }
+    }
+
+  
   return(
     <>
     <div className='w-[40%] p-[25px] rounded-2xl bg-[#fff]'>
+    
       <div className=' flex flex-row justify-between items-center '>
         <h1>Add Favourites</h1>
         <div className="relative">
       <button onClick={openDialogAdd} className=" text-black px-4 py-2 flex flex-row rounded-lg focus:outline-none">
       <img width="30" height="30" src="https://img.icons8.com/ios-filled/50/plus-math.png" alt="plus-math"/>
       </button>
+      <form onSubmit={handlesubmit} className='w-[100%]' action='POST'>
       {isOpenAdd && (
         <div className="fixed inset-0 overflow-y-auto flex items-center justify-center">
           {/* <div className="absolute z-9 inset-0 bg-gray-500 opacity-75"></div> */}
           <div className="bg-white z-11 rounded-lg p-8">
             <div className="text-xl font-semibold flex flex-col items-center mb-4">
 
-            <input type='text' size='20' id='usr' placeholder='Username' className='border-2 text-[18px] rounded-3xl px-3 py-2 my-2'></input>
-            <input type='text' size='20' id='wall' placeholder='wallet address' className='border-2 text-[18px] rounded-3xl  px-3 py-2 my-2'></input>
+            <input type='text' size='20'  name='user' onChange={handlechange} placeholder='Username' className='border-2 text-[18px] rounded-3xl px-3 py-2 my-2'></input>
+            <input type='text' size='20'  name='waddress' onChange={handlechange} placeholder='wallet address' className='border-2 text-[18px] rounded-3xl  px-3 py-2 my-2'></input>
             
             </div>
             <div className="flex justify-end">
               <button onClick={closeDialog} className="mr-4 bg-gray-300 hover:bg-gray-400 px-4 py-2 rounded-lg focus:outline-none">Cancel</button>
-              <button onClick={saveit}  className='bg-black px-4 py-2 rounded-lg w-[150px] text-white'>Save</button>
+              <button type='submit' className='bg-black px-4 py-2 rounded-lg w-[150px] text-white'>Save</button>
             </div>
           </div>
         </div>
       )}
+        </form>
         </div>
       </div>
+    
       <div id='addsave'>
 
       </div>
@@ -120,7 +150,7 @@ const AddRec = () =>{
     </>
   )
 }
-
+// recents
 const Shares = () =>{
   const location = useLocation();
   const recdata = location.state;

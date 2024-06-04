@@ -33,7 +33,6 @@ function Sidebar() {
       </div>
         <div>
             <label className='flex flex-row items-center'>
-                <div className='h-[50px] w-[50px] rounded-full bg-slate-400'></div>
                 <h1 className='pl-2'>Logout</h1>
             </label>
         </div>
