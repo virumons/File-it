@@ -6,8 +6,10 @@ import bodyParser from 'body-parser';
 import pg from 'pg';
 import multer from 'multer';
 import axios from 'axios';
-// import {create} from 'ipfs-http-client';
+// import { MongoClient } from 'mongodb';
 
+
+let Guserid = 0;
 const { Pool } = pg;
 const pool = new Pool({
     user: 'postgres',
@@ -16,13 +18,7 @@ const pool = new Pool({
     password: '@viru',
     port: 5432,
 });
-// const pool2 = new Pool({
-//     user: 'postgres',
-//     host:'localhost',
-//     database: 'Users',
-//     password: '@viru',
-//     port: 5432,
-// })
+
 
 const PORT = 8080;
 
@@ -38,29 +34,22 @@ app.post('/getall', (req, res) => {
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-
-app.post('/upload', upload.single('file'), async (req, res) => {
+app.post('/upload', cors(), async (req, res) => {
     try {
-        const file = req.file;
-        const filedata = new FormData();
-        filedata.append("file",file)
-      if (!file) {
-        return res.status(400).send({ message: 'No file uploaded' });
-      }else{
-        console.log(file);
-        const response = await axios({
-            method:"POST",
-            url:"https://api.pinata.cloud/pinning/pinFileToIPFS",
-            data:file,
-            headers:{
-                pinata_api_key: "41e55f076665914186ad",
-                pinata_secret_api_key:" 3659ebd1afc84d23bcc16d68a35495091fdc8ce4bbbf4e9caf3d43794a409e52",
-                "Content-Type":"multipart/form-data",
-            }
-        })
-        const fileURL = "https://gateway.pinata.cloud/ipfs/" + response.data.IpfsHash;
-        console.log(fileURL)
-      }
+        const link = req.body; 
+        console.log(link);
+        // fileUrlArray.push(link);
+        // res.send(fileUrlArray);
+        
+        
+            const client = await pool.connect();
+            console.log(Guserid,link);
+            const responses = await client.query("INSERT INTO links (userid, link) VALUES($1,$2)",[Guserid,link]);
+            console.log(responses);
+            res.send(responses)
+     
+            client.release();
+        
     } catch (error) {
       console.error('Error uploading file to IPFS:', error);
     }
@@ -73,13 +62,15 @@ app.post('/', cors(), async (req, res) => {
     try {
         console.log(req.body);
         const { fullname, phoneno, email, npwd, waddress, userid } = req.body;
+        Guserid = userid;
         const exist = await checkRegister(email, client);
         if (exist) {
             res.json("exist");
         } else {
-        
+          
             await client.query('INSERT INTO users_data (fullname, phoneno, email, password, waddress, userid) VALUES ($1, $2, $3, $4, $5, $6)', [fullname, phoneno, email, npwd, waddress, userid]);
             res.json({ message: 'Data inserted successfully' });
+            
         }
     } catch (err) {
         res.send(err);

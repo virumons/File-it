@@ -32,6 +32,11 @@ function Upload() {
     })
     const fileURL = "https://gateway.pinata.cloud/ipfs/" + response.data.IpfsHash;
     console.log(fileURL);
+   
+    axios.post("http://localhost:8080/upload",{fileURL})
+    .then(res=>{
+      console.log(res);
+    })
 
     } catch (error) {
       console.log(error);
