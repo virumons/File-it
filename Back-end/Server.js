@@ -6,8 +6,12 @@ import bodyParser from 'body-parser';
 import pg from 'pg';
 import multer from 'multer';
 import axios from 'axios';
-// import { MongoClient } from 'mongodb';
+// import { MongoClient } from 
+import dgram from "dgram";
 
+const socket = dgram.createSocket('udp4');
+const receiverip = '192.168.64.37';
+const recport = 8080;
 
 let Guserid = 0;
 const { Pool } = pg;
@@ -33,7 +37,7 @@ app.post('/getall', (req, res) => {
 // ********************** Upload part
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
-
+let Glink = "";
 app.post('/upload', cors(), async (req, res) => {
     try {
         const link = req.body; 
@@ -44,17 +48,41 @@ app.post('/upload', cors(), async (req, res) => {
         
             const client = await pool.connect();
             console.log(Guserid,link);
+            // Glink = link;
             const responses = await client.query("INSERT INTO links (userid, link) VALUES($1,$2)",[Guserid,link]);
             console.log(responses);
             res.send(responses)
      
             client.release();
+            let pass = Object.values(link);
+            socket.send(pass,recport,receiverip,(err)=>{
+                if(err){
+                    console.log(err)
+                }else{
+                    console.log("sent to recv")
+                }
+            })
+            socket.on("message",(msg,info)=>{
+                console.log(`from ${info}`);
+                Glink = msg.toString();
+                console.log(`message from : ${msg.toString()}`);
+            })
         
     } catch (error) {
-      console.error('Error uploading file to IPFS:', error);
+      console.error(error);
     }
   });
 //************************ Upload part 
+socket.bind(PORT)
+socket.on("message",(msg,info)=>{
+    console.log(`from ${info}`);
+    Glink = msg.toString();
+    console.log(Glink);
+    console.log(`message from : ${msg.toString()}`);
+})
+app.get("/uploads",(req,res)=>{
+    res.send(Glink);
+})
 
 app.post('/', cors(), async (req, res) => {
     const client = await pool.connect();
@@ -100,6 +128,7 @@ app.post("/login", cors(), async (req, res) => {
         client.release();
     }
 });
+
 
 app.listen(PORT, () => {
     console.log(`server is running on ${PORT} .....`);

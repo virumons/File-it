@@ -1,7 +1,18 @@
-import React from 'react'
+import React,{useEffect,useState} from 'react'
 import Sidebar from '../Dashboard/Sidebar.jsx';
+import axios from 'axios'
 
 const Shares = () =>{
+  const [backdata,setbackdata] = useState([{}])
+  useEffect(()=>{
+    axios.get("http://localhost:8080/uploads").then(
+      response=>response.json()
+    ).then(
+      data =>
+        setbackdata(data)
+    )
+    console.log(backdata)
+  },[])
     return(
       <>
       <div className='p-[20px] flex flex-col justify-start items-start mt-3 table-d'>
@@ -17,7 +28,7 @@ const Shares = () =>{
         </div> */}
         <div className='flex flex-row justify-between items-center w-[80%] pl-2 '>
           <input type='checkbox'></input>
-          <h1 className='font-medium'>CCR-PDF</h1>
+          <h1 className='font-medium'>{backdata}</h1>
           <h1>PDF</h1>
           <h1>13-Feb-2024</h1>
           <h1>Sent</h1>
